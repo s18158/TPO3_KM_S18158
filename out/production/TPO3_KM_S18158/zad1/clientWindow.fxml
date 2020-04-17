@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane fx:id="windowsPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="zad1.clientWindowController">
+  <children>
+    <AnchorPane fx:id="oPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+         <children>
+            <TextField fx:id="inputField" layoutX="14.0" layoutY="335.0" prefHeight="25.0" prefWidth="572.0" />
+            <TextArea fx:id="outputArea" layoutX="14.0" layoutY="14.0" prefHeight="315.0" prefWidth="556.0" />
+            <ScrollBar fx:id="textScroll" layoutX="570.0" layoutY="14.0" orientation="VERTICAL" prefHeight="315.0" prefWidth="14.0" />
+         </children></AnchorPane>
+  </children>
+</Pane>
