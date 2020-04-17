@@ -8,6 +8,7 @@ package zad1;
 
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,9 +26,7 @@ import java.util.Set;
 
 public class Client extends Application implements Runnable{
 
-  private static boolean listenerRunning = true;
   private static final int BUFFER_SIZE = 2048;
-  private static ByteBuffer readBuffer = ByteBuffer.allocate(BUFFER_SIZE);
   private static SocketChannel client;
   private static clientWindowController myClientWindowController;
   private static ArrayList<String> history;
@@ -52,7 +51,7 @@ public class Client extends Application implements Runnable{
   //Listener
   public void run() {
       try{
-          while (listenerRunning) {
+          while (true) {
               selector.select();
               Set<SelectionKey> keys = selector.selectedKeys();
               Iterator<SelectionKey> iterator = keys.iterator();
@@ -67,7 +66,6 @@ public class Client extends Application implements Runnable{
                       try {
                           client.finishConnect();
                       } catch (IOException e) {
-                          System.out.println(e);
                           myKey.cancel();
                           return;
                       }
@@ -102,9 +100,10 @@ public class Client extends Application implements Runnable{
   public void start(Stage primaryStage) throws Exception {
 
       FXMLLoader loader = new FXMLLoader(getClass().getResource("./clientWindow.fxml"));
-      Parent root =loader.load();
+      Parent root = loader.load();
       myClientWindowController = loader.getController();
       Scene scene = new Scene(root,600, 400);
+      primaryStage.setOnCloseRequest(e -> Platform.exit());
       primaryStage.setScene(scene);
       primaryStage.setTitle("test");
       primaryStage.show();
@@ -122,10 +121,6 @@ public class Client extends Application implements Runnable{
       }
       buffer.clear();
 
-  }
-
-  private static boolean isEmpty(ByteBuffer buf) {
-      return buf == null || buf.remaining() == 0;
   }
 
 }

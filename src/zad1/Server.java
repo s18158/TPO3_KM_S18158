@@ -17,26 +17,20 @@ import java.util.*;
 
 public class Server{
 
-  private static Selector selector;
-  private static boolean running = true;
   private static final int BUFFER_SIZE = 2048;
-  private static ByteBuffer newMsg = ByteBuffer.allocate(BUFFER_SIZE);
-  private static ArrayList<String> history = new ArrayList<>();
-  //private static Map<Integer, ByteBuffer>  pending = new HashMap<>();
-  private static Set<msgHolder> pending = new HashSet<>();
 
 
   @SuppressWarnings("unused")
   public static void main(String[] args) throws IOException {
 
-    selector = Selector.open();
+    Selector selector = Selector.open();
     ServerSocketChannel socketChannel = ServerSocketChannel.open();
     InetSocketAddress socketAddress = new InetSocketAddress("localhost", 11000);
     socketChannel.bind(socketAddress);
     socketChannel.configureBlocking(false);
     int ops = socketChannel.validOps();
     SelectionKey selectionKey = socketChannel.register(selector,ops, null);
-    while(running){
+    while(true){
 
       selector.select();
       Set<SelectionKey> keys = selector.selectedKeys();
@@ -64,7 +58,7 @@ public class Server{
           } else {
             byteBuffer.flip();
             Iterator<SelectionKey> it = selector.keys().iterator();
-            SelectionKey thisKey = null;
+            SelectionKey thisKey;
             while (it.hasNext()){
               thisKey = it.next();
               ByteBuffer buf = (ByteBuffer)thisKey.attachment();
@@ -116,32 +110,4 @@ public class Server{
     System.out.println(s);
   }
 
-  private static boolean isEmpty(ByteBuffer buf) {
-    return buf == null || buf.remaining() == 0;
-  }
-
-}
-
-class msgHolder{
-
-  private static int howManyClients;
-  private static ByteBuffer msg;
-
-  msgHolder(int clients, ByteBuffer message){
-    howManyClients = clients;
-    msg = message;
-  }
-
-  ByteBuffer getMsg(){
-    log("getMsg: "+howManyClients);
-    return msg;
-  }
-
-  void decreaseClients(){howManyClients--;}
-
-  int getHowManyClients(){return howManyClients;}
-
-  private static void log(String s){
-    System.out.println(s);
-  }
 }
