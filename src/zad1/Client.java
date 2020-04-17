@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
-public class Client extends Application implements Runnable{
+public class Client extends Application implements Runnable {
 
     private static final int BUFFER_SIZE = 2048;
     private static SocketChannel client;
@@ -31,9 +31,8 @@ public class Client extends Application implements Runnable{
     private static ArrayList<String> history;
     private static Selector selector;
     private static String logedInAs;
-    private static String[] myArgs;
 
-    Client() throws IOException{
+    public static void main(String[] args) throws IOException {
         selector = Selector.open();
         InetSocketAddress socketAddress = new InetSocketAddress("localhost", 11000);
         client = SocketChannel.open(socketAddress);
@@ -41,15 +40,15 @@ public class Client extends Application implements Runnable{
         int ops = client.validOps();
         client.register(selector, ops, null);
         history = new ArrayList<>();
-        //new Thread(new Client()).start();
-        launch(myArgs);
+        new Thread(new Client()).start();
+        launch();
 
     }
 
     @Override
     //Listener
     public void run() {
-        try{
+        try {
             while (true) {
                 selector.select();
                 Set<SelectionKey> keys = selector.selectedKeys();
@@ -79,7 +78,7 @@ public class Client extends Application implements Runnable{
                             String result = new String(buf.array()).trim();
                             history.add(result);
                             StringBuilder sb = new StringBuilder();
-                            history.forEach(s-> sb.append(logedInAs).append(": ").append(s).append("\n"));
+                            history.forEach(s -> sb.append(logedInAs).append(": ").append(s).append("\n"));
                             myClientWindowController.displayMsg(sb.toString());
                             log(history.toString().trim());
                             buf.clear();
@@ -87,12 +86,12 @@ public class Client extends Application implements Runnable{
                     }
                 }
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void log(String s){
+    private void log(String s) {
         System.out.println(s);
     }
 
@@ -102,14 +101,14 @@ public class Client extends Application implements Runnable{
         FXMLLoader loader = new FXMLLoader(getClass().getResource("./clientWindow.fxml"));
         Parent root = loader.load();
         myClientWindowController = loader.getController();
-        Scene scene = new Scene(root,600, 400);
+        Scene scene = new Scene(root, 600, 400);
         primaryStage.setScene(scene);
         primaryStage.setTitle("ChatNIO");
         primaryStage.show();
 
     }
 
-    static void write (String s){
+    static void write(String s) {
 
         byte[] msg = s.getBytes();
         ByteBuffer buffer = ByteBuffer.wrap(msg);
@@ -122,12 +121,8 @@ public class Client extends Application implements Runnable{
 
     }
 
-    static void setLogedInAs(String s){
+    static void setLogedInAs(String s) {
         logedInAs = s;
     }
 
-    public static void main(String[] args) throws IOException{
-        myArgs=args;
-        new Thread(new Client()).start();
-    }
 }
