@@ -1,23 +1,37 @@
+/**
+ *
+ *  @author Kondej Mariusz S18158
+ *
+ */
+
 package zad1;
 
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import java.io.IOException;
 
-public class Main extends Application {
-
-    @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("./clientWindow.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
-        primaryStage.show();
-    }
-
-
-    public static void main(String[] args) {
-        launch(args);
+public class Main {
+    public static void main(String[] args) throws InterruptedException {
+        new Thread(() -> {
+            try {
+                new Server();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+        Thread.sleep(5000);
+        new Thread(() -> {
+            try {
+                new Client();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+        Thread.sleep(1000);
+        new Thread(() -> {
+            try {
+                new Client();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
