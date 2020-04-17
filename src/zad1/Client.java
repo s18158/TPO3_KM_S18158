@@ -31,6 +31,7 @@ public class Client extends Application implements Runnable{
   private static clientWindowController myClientWindowController;
   private static ArrayList<String> history;
   private static Selector selector;
+  private static Stage thisStage;
 
   @SuppressWarnings("unused")
   public static void main(String[] args) throws IOException{
@@ -77,12 +78,18 @@ public class Client extends Application implements Runnable{
                       } else {
                           client.read(buf);
                           String result = new String(buf.array()).trim();
-                          history.add(result);
-                          StringBuilder sb = new StringBuilder();
-                          history.forEach(s-> sb.append(s).append("\n"));
-                          myClientWindowController.displayMsg(sb.toString());
-                          log(history.toString().trim());
-                          buf.clear();
+                          log(result);
+                          if (result.equals("Access_granted!")){
+
+                            sceneChange(thisStage);
+                          } else {
+                              history.add(result);
+                              StringBuilder sb = new StringBuilder();
+                              history.forEach(s -> sb.append(s).append("\n"));
+                              myClientWindowController.displayMsg(sb.toString());
+                              log(history.toString().trim());
+                              buf.clear();
+                          }
                       }
                   }
               }
@@ -99,14 +106,18 @@ public class Client extends Application implements Runnable{
   @Override
   public void start(Stage primaryStage) throws Exception {
 
-      FXMLLoader loader = new FXMLLoader(getClass().getResource("./clientWindow.fxml"));
-      Parent root = loader.load();
-      myClientWindowController = loader.getController();
-      Scene scene = new Scene(root,600, 400);
-      primaryStage.setOnCloseRequest(e -> Platform.exit());
-      primaryStage.setScene(scene);
-      primaryStage.setTitle("test");
-      primaryStage.show();
+      thisStage = primaryStage;
+
+      FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("./clientLoginWindow.fxml"));
+
+      Parent loginRoot = loginLoader.load();
+
+
+      Scene loginScene = new Scene(loginRoot, 332, 185);
+      thisStage.setOnCloseRequest(e -> Platform.exit());
+      thisStage.setScene(loginScene);
+      thisStage.setTitle("Login");
+      thisStage.show();
 
   }
 
@@ -122,5 +133,30 @@ public class Client extends Application implements Runnable{
       buffer.clear();
 
   }
+
+    static void sendCredentials (String login, int hashedPass, String ifNew){
+
+        String message = ifNew+" "+login+" "+hashedPass;
+        byte[] msg = message.getBytes();
+        ByteBuffer buffer = ByteBuffer.wrap(msg);
+        try {
+            client.write(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        buffer.clear();
+
+    }
+
+    private void sceneChange(Stage stage) throws IOException{
+        stage.hide();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("./clientWindow.fxml"));
+        Parent root = loader.load();
+        myClientWindowController = loader.getController();
+        Scene newScene = new Scene(root,600, 400);
+        stage.setScene(newScene);
+        stage.setTitle("ChatNIO");
+        stage.show();
+    }
 
 }
